@@ -12,13 +12,6 @@ const PAGES_DIR = path.resolve(__dirname, '../pages');
 
 /** These directories will not be placed in the sidebar, but will still be searchable */
 const hiddenSections = ['FAQ', 'Troubleshooting'];
-/** These sections will NOT be expanded by default in the sidebar */
-const collapsedSections = [
-  'Deprecated',
-  'Regulatory Compliance',
-  'UI Programming',
-  'Technical Specs',
-];
 
 // TODO(cedric): refactor docs to get rid of the directory lists
 
@@ -219,35 +212,49 @@ const general = [
   makeSection('Classic Services', [
     makeGroup('Classic Services', sortAlphabetical(pagesFromDir('classic'))),
   ]),
-  makeSection('UI Programming', [
-    makeGroup('UI Programming', [
-      makePage('ui-programming/image-background.md'),
-      makePage('ui-programming/implementing-a-checkbox.md'),
-      makePage('ui-programming/z-index.md'),
-      makePage('ui-programming/using-svgs.md'),
-      makePage('ui-programming/react-native-toast.md'),
-      makePage('ui-programming/react-native-styling-buttons.md'),
-    ]),
-  ]),
-  makeSection('Regulatory Compliance', [
-    makeGroup('Regulatory Compliance', sortAlphabetical(pagesFromDir('regulatory-compliance'))),
-  ]),
-  makeSection('Technical Specs', [
-    makeGroup('Technical Specs', [
-      makePage('technical-specs/expo-updates-0.md'),
-      makePage('technical-specs/expo-sfv-0.md'),
-    ]),
-  ]),
-  makeSection('Deprecated', [
-    makeGroup('ExpoKit', [
-      makePage('expokit/overview.md'),
-      makePage('expokit/eject.md'),
-      makePage('expokit/expokit.md'),
-      makePage('expokit/advanced-expokit-topics.md'),
-      makePage('expokit/universal-modules-and-expokit.md'),
-    ]),
-    makeGroup('Archived', sortAlphabetical(pagesFromDir('archived'))),
-  ]),
+  makeSection(
+    'UI Programming',
+    [
+      makeGroup('UI Programming', [
+        makePage('ui-programming/image-background.md'),
+        makePage('ui-programming/implementing-a-checkbox.md'),
+        makePage('ui-programming/z-index.md'),
+        makePage('ui-programming/using-svgs.md'),
+        makePage('ui-programming/react-native-toast.md'),
+        makePage('ui-programming/react-native-styling-buttons.md'),
+      ]),
+    ],
+    { collapsed: true }
+  ),
+  makeSection(
+    'Regulatory Compliance',
+    [makeGroup('Regulatory Compliance', sortAlphabetical(pagesFromDir('regulatory-compliance')))],
+    { collapsed: true }
+  ),
+  makeSection(
+    'Technical Specs',
+    [
+      makeGroup('Technical Specs', [
+        makePage('technical-specs/expo-updates-0.md'),
+        makePage('technical-specs/expo-sfv-0.md'),
+      ]),
+    ],
+    { collapsed: true }
+  ),
+  makeSection(
+    'Deprecated',
+    [
+      makeGroup('ExpoKit', [
+        makePage('expokit/overview.md'),
+        makePage('expokit/eject.md'),
+        makePage('expokit/expokit.md'),
+        makePage('expokit/advanced-expokit-topics.md'),
+        makePage('expokit/universal-modules-and-expokit.md'),
+      ]),
+      makeGroup('Archived', sortAlphabetical(pagesFromDir('archived'))),
+    ],
+    { collapsed: true }
+  ),
   // TODO(cedric): this group isn't visible in the current sidebar, check if we need to fix or remove it
   makeGroup('Troubleshooting', pagesFromDir('troubleshooting')),
 ];
@@ -384,20 +391,24 @@ module.exports = {
   easDirectories,
   featurePreviewDirectories,
   hiddenSections,
-  collapsedSections,
 };
 
 // --- MDX methods ---
 
-function makeSection(name, children = []) {
+/**
+ * @param {string} name
+ * @param {any[]} [children=[]]
+ * @param {Partial<import('~/types/common').NavigationRoute>} [overwrites={}]
+ */
+function makeSection(name, children = [], overwrites = {}) {
   // TODO(cedric): refactor node types to match unist
-  return { name, children };
+  return { name, children, ...overwrites };
 }
 
 /**
- * @param {string} name 
- * @param {any[]} [children=[]] 
- * @param {Partial<import('~/types/common').NavigationRoute>} [overwrites={}] 
+ * @param {string} name
+ * @param {any[]} [children=[]]
+ * @param {Partial<import('~/types/common').NavigationRoute>} [overwrites={}]
  */
 function makeGroup(name, children = [], overwrites = {}) {
   // TODO(cedric): refactor node types to match unist
