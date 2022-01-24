@@ -8,11 +8,6 @@ const { URL } = require('url');
 const { LATEST_VERSION } = require('./versions');
 const PAGES_DIR = path.resolve(__dirname, '../pages');
 
-// TODO(cedric): refactor hidden and collapsed sections into properties of the groups
-
-/** These directories will not be placed in the sidebar, but will still be searchable */
-const hiddenSections = ['FAQ', 'Troubleshooting'];
-
 // TODO(cedric): refactor docs to get rid of the directory lists
 
 /** Manual list of directories to pull in to the getting started tutorial */
@@ -256,7 +251,7 @@ const general = [
     { collapsed: true }
   ),
   // TODO(cedric): this group isn't visible in the current sidebar, check if we need to fix or remove it
-  makeGroup('Troubleshooting', pagesFromDir('troubleshooting')),
+  makeGroup('Troubleshooting', pagesFromDir('troubleshooting'), { hidden: true }),
 ];
 
 const eas = [
@@ -390,7 +385,6 @@ module.exports = {
   previewDirectories,
   easDirectories,
   featurePreviewDirectories,
-  hiddenSections,
 };
 
 // --- MDX methods ---
