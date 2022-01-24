@@ -315,7 +315,7 @@ const preview = [
 ];
 
 const featurePreview = [
-  makeGroup('Feature Preview', [], './pages/feature-preview/'),
+  makeGroup('Feature Preview', [], { href: './pages/feature-preview/', hidden: true }),
   makeSection('Development Builds', [
     makeGroup('Development Builds', [
       makePage('development/introduction.md'),
@@ -394,9 +394,14 @@ function makeSection(name, children = []) {
   return { name, children };
 }
 
-function makeGroup(name, children = [], href = '') {
+/**
+ * @param {string} name 
+ * @param {any[]} [children=[]] 
+ * @param {Partial<import('~/types/common').NavigationRoute>} [overwrites={}] 
+ */
+function makeGroup(name, children = [], overwrites = {}) {
   // TODO(cedric): refactor node types to match unist
-  return { name, href, posts: children };
+  return { name, posts: children, ...overwrites };
 }
 
 /**
