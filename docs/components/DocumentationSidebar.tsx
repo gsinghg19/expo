@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import * as React from 'react';
 
-import DocumentationSidebarCollapsible from '~/components/DocumentationSidebarGroup';
+import DocumentationSidebarCollapsible from '~/components/DocumentationSidebarCollapsible';
 import DocumentationSidebarLink from '~/components/DocumentationSidebarLink';
 import DocumentationSidebarTitle from '~/components/DocumentationSidebarTitle';
 import VersionSelector from '~/components/VersionSelector';
