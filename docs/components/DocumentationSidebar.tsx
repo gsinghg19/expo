@@ -35,14 +35,14 @@ type SidebarNodeProps = Pick<SidebarProps, 'url' | 'asPath'> & {
   parentRoute?: NavigationRoute;
 };
 
-export default function NewDocumentationSidebar(props: SidebarProps) {
+export default function DocumentationSidebar(props: SidebarProps) {
   return (
     <nav css={STYLES_SIDEBAR} data-sidebar>
       {!props.isVersionSelectorHidden && (
         <VersionSelector version={props.version} onSetVersion={props.onSetVersion} />
       )}
       {props.routes.map(section => (
-        <NewDocumentationSidebarSection
+        <DocumentationSidebarSection
           key={`section-${section.name}`}
           route={section}
           url={props.url}
@@ -53,7 +53,7 @@ export default function NewDocumentationSidebar(props: SidebarProps) {
   );
 }
 
-function NewDocumentationSidebarSection(props: SidebarNodeProps) {
+function DocumentationSidebarSection(props: SidebarNodeProps) {
   // If the section or group is hidden, we should not render it
   if (props.route.hidden) {
     return null;
@@ -61,7 +61,7 @@ function NewDocumentationSidebarSection(props: SidebarNodeProps) {
 
   // If a group was passed instead of section, just render that instead
   if (!props.route.children) {
-    return <NewDocumentationSidebarGroup {...props} />;
+    return <DocumentationSidebarGroup {...props} />;
   }
 
   return (
@@ -71,7 +71,7 @@ function NewDocumentationSidebarSection(props: SidebarNodeProps) {
       info={props.route}
       asPath={props.asPath}>
       {props.route.children.map(group => (
-        <NewDocumentationSidebarGroup
+        <DocumentationSidebarGroup
           {...props}
           key={`group-${props.route.name}`}
           route={group}
@@ -82,7 +82,7 @@ function NewDocumentationSidebarSection(props: SidebarNodeProps) {
   );
 }
 
-function NewDocumentationSidebarGroup(props: SidebarNodeProps) {
+function DocumentationSidebarGroup(props: SidebarNodeProps) {
   return (
     <div css={STYLES_SECTION_CATEGORY}>
       {!shouldSkipTitle(props.route, props.parentRoute) && (
