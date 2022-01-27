@@ -1,11 +1,10 @@
 import { css } from '@emotion/react';
 import * as React from 'react';
 
-import DocumentationSidebarGroup from '~/components/DocumentationSidebarGroup';
+import DocumentationSidebarCollapsible from '~/components/DocumentationSidebarGroup';
 import DocumentationSidebarLink from '~/components/DocumentationSidebarLink';
 import DocumentationSidebarTitle from '~/components/DocumentationSidebarTitle';
 import VersionSelector from '~/components/VersionSelector';
-import { hiddenSections } from '~/constants/navigation';
 import * as Constants from '~/constants/theme';
 import { NavigationRoute, Url } from '~/types/common';
 
@@ -22,12 +21,90 @@ const STYLES_SECTION_CATEGORY = css`
   margin-bottom: 24px;
 `;
 
-function shouldSkipCategory(info: NavigationRoute) {
-  if (info.name === 'Feature Preview') {
-    return true;
+type SidebarProps = {
+  url: Url;
+  asPath: string;
+  isVersionSelectorHidden: boolean;
+  routes: NavigationRoute[];
+  version: string;
+  onSetVersion: (value: string) => void;
+};
+
+type SidebarNodeProps = Pick<SidebarProps, 'url' | 'asPath'> & {
+  route: NavigationRoute;
+  parentRoute?: NavigationRoute;
+};
+
+export default function NewDocumentationSidebar(props: SidebarProps) {
+  return (
+    <nav css={STYLES_SIDEBAR} data-sidebar>
+      {!props.isVersionSelectorHidden && (
+        <VersionSelector version={props.version} onSetVersion={props.onSetVersion} />
+      )}
+      {props.routes.map(section => (
+        <NewDocumentationSidebarSection
+          key={`section-${section.name}`}
+          route={section}
+          url={props.url}
+          asPath={props.asPath}
+        />
+      ))}
+    </nav>
+  );
+}
+
+function NewDocumentationSidebarSection(props: SidebarNodeProps) {
+  // If the section or group is hidden, we should not render it
+  if (props.route.hidden) {
+    return null;
   }
 
-  return false;
+  // If a group was passed instead of section, just render that instead
+  if (!props.route.children) {
+    return <NewDocumentationSidebarGroup {...props} />;
+  }
+
+  return (
+    <DocumentationSidebarCollapsible
+      key={`group-${props.route.name}`}
+      url={props.url}
+      info={props.route}
+      asPath={props.asPath}>
+      {props.route.children.map(group => (
+        <NewDocumentationSidebarGroup
+          {...props}
+          key={`group-${props.route.name}`}
+          route={group}
+          parentRoute={props.route}
+        />
+      ))}
+    </DocumentationSidebarCollapsible>
+  );
+}
+
+function NewDocumentationSidebarGroup(props: SidebarNodeProps) {
+  return (
+    <div css={STYLES_SECTION_CATEGORY}>
+      {!shouldSkipTitle(props.route, props.parentRoute) && (
+        <DocumentationSidebarTitle
+          key={props.route.sidebarTitle ? props.route.sidebarTitle : props.route.name}
+          info={props.route}
+          url={props.url}
+          asPath={props.asPath}>
+          {props.route.sidebarTitle ? props.route.sidebarTitle : props.route.name}
+        </DocumentationSidebarTitle>
+      )}
+      {(props.route.posts || []).map(page => (
+        <DocumentationSidebarLink
+          key={`${props.route.name}-${page.name}`}
+          info={page}
+          url={props.url}
+          asPath={props.asPath}>
+          {page.sidebarTitle || page.name}
+        </DocumentationSidebarLink>
+      ))}
+    </div>
+  );
 }
 
 function shouldSkipTitle(info: NavigationRoute, parentGroup?: NavigationRoute) {
@@ -46,96 +123,4 @@ function shouldSkipTitle(info: NavigationRoute, parentGroup?: NavigationRoute) {
   }
 
   return false;
-}
-
-type Props = {
-  url: Url;
-  asPath: string;
-  isVersionSelectorHidden: boolean;
-  routes: NavigationRoute[];
-  version: string;
-  onSetVersion: (value: string) => void;
-};
-
-export default class DocumentationSidebar extends React.Component<Props> {
-  static defaultProps = {
-    routes: [],
-  };
-
-  private renderPostElements = (info: NavigationRoute, category: string) => {
-    return (
-      <DocumentationSidebarLink
-        key={`${category}-${info.name}`}
-        info={info}
-        url={this.props.url}
-        asPath={this.props.asPath}>
-        {info.sidebarTitle || info.name}
-      </DocumentationSidebarLink>
-    );
-  };
-
-  private renderCategoryElements = (info: NavigationRoute, parentGroup?: NavigationRoute) => {
-    if (shouldSkipCategory(info)) {
-      return null;
-    }
-
-    if (info.children) {
-      return (
-        <DocumentationSidebarGroup
-          key={`group-${info.name}`}
-          url={this.props.url}
-          info={info}
-          asPath={this.props.asPath}>
-          {info.children.map(categoryInfo => this.renderCategoryElements(categoryInfo, info))}
-        </DocumentationSidebarGroup>
-      );
-    }
-
-    const titleElement = shouldSkipTitle(info, parentGroup) ? null : (
-      <DocumentationSidebarTitle
-        key={info.sidebarTitle ? info.sidebarTitle : info.name}
-        info={info}
-        url={this.props.url}
-        asPath={this.props.asPath}>
-        {info.sidebarTitle ? info.sidebarTitle : info.name}
-      </DocumentationSidebarTitle>
-    );
-
-    let postElements;
-    if (info.posts) {
-      postElements = info.posts.map(postInfo => this.renderPostElements(postInfo, info.name));
-    }
-
-    return (
-      <div css={STYLES_SECTION_CATEGORY} key={`category-${info.name}`}>
-        {titleElement}
-        {postElements}
-      </div>
-    );
-  };
-
-  render() {
-    const customDataAttributes = {
-      'data-sidebar': true,
-    };
-
-    return (
-      <nav css={STYLES_SIDEBAR} {...customDataAttributes}>
-        {!this.props.isVersionSelectorHidden && (
-          <VersionSelector version={this.props.version} onSetVersion={this.props.onSetVersion} />
-        )}
-
-        {this.props.routes.map(categoryInfo => {
-          if (categoryIsHidden(categoryInfo.name)) {
-            return null;
-          }
-          return this.renderCategoryElements(categoryInfo);
-        })}
-      </nav>
-    );
-  }
-}
-
-function categoryIsHidden(categoryName: string): boolean {
-  return hiddenSections.includes(categoryName);
 }
