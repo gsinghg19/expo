@@ -3,6 +3,7 @@
 const frontmatter = require('front-matter');
 const fs = require('fs');
 const path = require('path');
+const make = require('unist-builder');
 const { URL } = require('url');
 
 const { LATEST_VERSION } = require('./versions');
@@ -388,14 +389,12 @@ module.exports = {
 
 // --- MDX methods ---
 
-function makeSection(name, children = []) {
-  // TODO(cedric): refactor node types to match unist
-  return { name, children };
+function makeSection(name, children = [], props = {}) {
+  return make('section', { name, ...props }, children);
 }
 
-function makeGroup(name, children = [], href = '') {
-  // TODO(cedric): refactor node types to match unist
-  return { name, href, posts: children };
+function makeGroup(name, children = [], props = {}) {
+  return make('group', { name, ...props }, children);
 }
 
 /**
@@ -432,7 +431,7 @@ function makePage(file) {
   if (data.hidden) {
     result.hidden = data.hidden;
   }
-  return result;
+  return make('page', result);
 }
 
 // --- Other helpers ---
