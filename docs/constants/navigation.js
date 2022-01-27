@@ -315,7 +315,6 @@ const preview = [
 ];
 
 const featurePreview = [
-  makeGroup('Feature Preview', [], './pages/feature-preview/'),
   makeSection('Development Builds', [
     makeGroup('Development Builds', [
       makePage('development/introduction.md'),
