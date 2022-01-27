@@ -49,7 +49,7 @@ const HIDDEN_ON_DESKTOP = css`
   }
 `;
 
-type Props = {
+type Props = React.PropsWithChildren<{
   url: Url;
   title: string;
   asPath: string;
@@ -61,7 +61,7 @@ type Props = {
   hideFromSearch?: boolean;
   /** The current api version provided by `withApiVersion` HOC */
   version?: string;
-};
+}>;
 
 type State = {
   isMenuActive: boolean;
